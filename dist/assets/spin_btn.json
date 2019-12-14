@@ -1,0 +1,44 @@
+{"frames": {
+
+"btn_spin_disabled.png":
+{
+	"frame": {"x":2,"y":2,"w":182,"h":178},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":182,"h":178},
+	"sourceSize": {"w":182,"h":178}
+},
+"btn_spin_hover.png":
+{
+	"frame": {"x":188,"y":2,"w":182,"h":178},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":182,"h":178},
+	"sourceSize": {"w":182,"h":178}
+},
+"btn_spin_normal.png":
+{
+	"frame": {"x":2,"y":2,"w":182,"h":178},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":182,"h":178},
+	"sourceSize": {"w":182,"h":178}
+},
+"btn_spin_pressed.png":
+{
+	"frame": {"x":374,"y":2,"w":182,"h":178},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":182,"h":178},
+	"sourceSize": {"w":182,"h":178}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "spin_btn.png",
+	"format": "RGBA8888",
+	"size": {"w":558,"h":182},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:a6a93cfa029f8dc062417b1525085cb6:1dfc15c4023ed3f1f99ae8cde85f548b:1119f8462f030c91855dfe9a1bda4108$"
+}
+}
