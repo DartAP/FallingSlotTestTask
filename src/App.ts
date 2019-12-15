@@ -22,19 +22,18 @@ export default class App{
         this.initAssets();
 
         const appEmitter = new EventEmitter();
+        appEmitter.setMaxListeners(15);
+
         const ticker = new PIXI.Ticker();
-        ticker.start();
+        ticker.start();        
 
         const mainScene = new PIXI.Container;
-        
         const reels = new Reels(ticker, appEmitter);        
-        mainScene.addChild(reels.reelsContainer);     
-        
         const spinBtn = new SpinBtn(appEmitter);
-        mainScene.addChild(spinBtn.getContainer);
         
+        mainScene.addChild(reels.reelsContainer);     
+        mainScene.addChild(spinBtn.getContainer);
         app.stage.addChild(mainScene);
-        appEmitter.emit(GameConstant.spinBtnEvent.spin);        
     };
 
     static initAssets() {

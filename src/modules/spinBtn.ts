@@ -4,49 +4,41 @@ import { EventEmitter } from 'events';
 
 enum btnState {
     normal = 'IDLE',
-    pressed = 'PRESSED',
-    hover = 'HOVER',
     disabled = 'DISABLED'
 }
 
 export default class SpinBtn {
     
-    private sound: Howl;    
-    private container: PIXI.Container;
-    private state: string = 'IDLE';   
-    private button: PIXI.Sprite; 
+    private disabledTexture = PIXI.Texture.from(GameConstant.spinBtnTexture[0]);
+    private hoverTexture = PIXI.Texture.from(GameConstant.spinBtnTexture[1]);
+    private normalTexture = PIXI.Texture.from(GameConstant.spinBtnTexture[2]);
+    private pressedTexture = PIXI.Texture.from(GameConstant.spinBtnTexture[3]);
+
+    private sound = new Howl({src: [GameConstant.spinSound]});
+    private container = new PIXI.Container();
+    private state = 'IDLE';   
+    private button = new PIXI.Sprite(this.normalTexture);
     private emitter: EventEmitter;
 
-    disabledTexture = PIXI.Texture.from(GameConstant.spinBtnTexture[0]);
-    hoverTexture = PIXI.Texture.from(GameConstant.spinBtnTexture[1]);
-    normalTexture = PIXI.Texture.from(GameConstant.spinBtnTexture[2]);
-    pressedTexture = PIXI.Texture.from(GameConstant.spinBtnTexture[3]);
-    
-    isdown: boolean;
-    texture: any;
-    alpha: number;
-    isOver: any;
-
-     
 
     constructor(emitter: EventEmitter) {
-        this.button = new PIXI.Sprite(this.normalTexture);
-        this.sound = new Howl({src: [GameConstant.spinSound]});
-        this.emitter = emitter;
-        this.container = new PIXI.Container();
+        this.emitter = emitter;        
         this.container.addChild(this.button);
-        this.init();
-        this.addListeners();
-    }
 
-    init() {        
-        this.container.addChild(this.button);
         this.container.x = 1200;
         this.container.y = 800
         this.button.buttonMode = true;
         this.button.interactive = true;
         
-        
+        this.addListeners();
+        this.disableBtn();  // Because of initial first spin
+    } 
+
+    private addListeners() {
+        this.emitter.addListener(GameConstant.spinBtnEvent.enable, () => {this.enableBtn()});
+        this.emitter.addListener(GameConstant.spinBtnEvent.disable, () => {this.disableBtn()});
+        this.emitter.addListener(GameConstant.reelsEvent.ready, () => {this.enableBtn()})
+
         this.button.on('pointerover', (): void => {
             if (this.state != btnState.disabled)
             {
@@ -66,20 +58,12 @@ export default class SpinBtn {
                 this.swapTexture(this.pressedTexture);          
                 this.sound.play();
                                 
-                this.emitter.emit(GameConstant.spinBtnEvent.spin);                
-                this.emitter.emit(GameConstant.spinBtnEvent.disable)                
+                setTimeout(() => { // To show pressed state
+                    this.emitter.emit(GameConstant.spinBtnEvent.spin);                
+                    this.emitter.emit(GameConstant.spinBtnEvent.disable) 
+                }, GameConstant.spinBtnPressedDelay);                  
             }
-        })        
-
-    }    
-
-
-
-
-    private addListeners() {
-        this.emitter.addListener(GameConstant.spinBtnEvent.enable, () => {this.enableBtn()});
-        this.emitter.addListener(GameConstant.spinBtnEvent.disable, () => {this.disableBtn()});
-        this.emitter.addListener(GameConstant.reelsEvent.ready, () => {this.enableBtn()})
+        })
     }
 
     private enableBtn() {
@@ -90,7 +74,7 @@ export default class SpinBtn {
     }
 
     private disableBtn() {
-        this.swapTexture(this.pressedTexture);
+        this.swapTexture(this.disabledTexture);
         this.state = btnState.disabled;
         console.log('❌ BTN DISABLED');
     }
@@ -98,6 +82,8 @@ export default class SpinBtn {
     private swapTexture(texture: PIXI.Texture) {
         this.button.texture = texture;
     }
+
+
 
     public get getContainer(): PIXI.Container {
         return this.container;

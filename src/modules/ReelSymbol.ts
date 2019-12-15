@@ -3,41 +3,37 @@ import { GameConstant } from './constants';
 import 'howler';
 import { EventEmitter } from 'events';
 
-export default class ReelSymbol extends PIXI.DisplayObject {
+export default class ReelSymbol {
     
-    private size:{
-        height: number,
-        width: number
-    }
-    private sound: Howl;    
-    private container: PIXI.Container;    
+    private sound = new Howl({src: this.getRandomSound()}); 
+    private container = new PIXI.Container();   
     private colIndex: number;
     private rowIndex: number;
     private ticker: PIXI.Ticker;
-    private symbol: PIXI.Sprite;
+    private symbol = new PIXI.Sprite(this.getRandomTexture());
     private emitter: EventEmitter;
     
-    public constructor(ticker: PIXI.Ticker, emitter: EventEmitter, colIndex: number, rowIndex: number) {
-        super();
-        this.size = GameConstant.symbol;        
-        this.container = new PIXI.Container();
+    public constructor(ticker: PIXI.Ticker, emitter: EventEmitter, colIndex: number, rowIndex: number) {                       
         this.colIndex = colIndex;
         this.rowIndex = rowIndex;
         this.ticker = ticker;
         this.emitter = emitter;
-        this.init();                    
+
+        this.container.addChild(this.symbol);        
+        this.container.x = this.rowIndex * GameConstant.symbol.height;
+
+        this.addListeners();        
+        this.dropSymbol(); // For initial spin
+        
     }    
 
-    init() {
-        this.symbol = new PIXI.Sprite(this.getRandomTexture())        
-        this.sound = new Howl({src: this.getRandomSound()});
-        this.container.addChild(this.symbol);        
-        this.container.x = this.rowIndex * this.size.height;
-        this.dropSymbol();
-    }    
+    private addListeners() {
+        this.emitter.on(GameConstant.spinBtnEvent.spin, () => {this.removeSymbol()});
+        this.emitter.on(GameConstant.reelsEvent.clean, () => {this.dropSymbol()});
+    }
 
     private calcGround(): number {
-        return (GameConstant.reels.cols - this.colIndex) * this.size.height;
+        return (GameConstant.reels.cols - this.colIndex) * GameConstant.symbol.height;
     }
 
     private calcDelay(): number {
@@ -52,69 +48,58 @@ export default class ReelSymbol extends PIXI.DisplayObject {
     private getRandomSound(): string {
         const soundId = Math.floor(Math.random() * GameConstant.landingSounds.length);
         return GameConstant.landingSounds[soundId];
+    }    
+
+    public dropSymbol() {                        
+        this.container.y = (this.colIndex * -GameConstant.reels.rows) * GameConstant.symbol.height;
+        let groundY = this.calcGround();
+        this.symbol.texture = this.getRandomTexture();
+        this.container.visible = true;            
+
+        const fall = (deltaTime: number): void =>{
+            this.container.y += GameConstant.fallingSpeed * deltaTime;                
+            
+            if (this.container.y >= groundY) {                                                            
+                this.container.y = groundY;
+                console.log("👌 LANDED");
+                this.sound.play();
+
+                if (this.lastElement()) {
+                    this.emitter.emit(GameConstant.reelsEvent.ready);
+                    console.log('👌👌👌 LAST LANDING');
+                    
+                }                    
+                this.ticker.remove(fall);
+            }
+        }            
+        
+        setTimeout((): void => { this.ticker.add(fall) },this.calcDelay()); 
+    };
+
+    public removeSymbol() {                    
+        const fall = (deltaTime: number): void =>{
+            this.container.y += GameConstant.fallingSpeed * deltaTime;                
+            
+            if (this.container.y >= GameConstant.dropReelPos) {                
+                console.log("💥 REMOVED");
+                if (this.lastElement()) {
+                    this.emitter.emit(GameConstant.reelsEvent.clean);
+                    console.log('💥💥💥 LAST REMOVED');
+                }                
+                this.ticker.remove(fall);                    
+            }
+        }            
+        
+        setTimeout((): void => { this.ticker.add(fall) },this.calcDelay()); 
+    };
+
+    private lastElement(): boolean {
+        return this.colIndex == GameConstant.reels.cols &&
+               this.rowIndex == GameConstant.reels.rows
     }
 
     public get symbolContainer(): PIXI.Container {
         return this.container;
     }
-
-    public dropSymbol(): Promise<void> {                        
-        return new Promise((landing): void =>{
-            this.container.y = (this.colIndex * -3) * this.size.height;
-            let groundY = this.calcGround();
-            this.symbol.texture = this.getRandomTexture();
-            this.container.visible = true;            
-            let velocity = GameConstant.fallingSpeed;
-
-            const fall = (delta: number): void =>{
-                this.container.y += velocity * delta;                
-                
-                if (this.container.y >= groundY) {                                        
-                    landing();
-                    this.container.y = groundY;
-                    console.log("👌 LANDED");
-                    this.sound.play();
-
-                    if (this.colIndex == GameConstant.reels.cols &&
-                        this.rowIndex == GameConstant.reels.rows) {
-                        this.emitter.emit(GameConstant.reelsEvent.ready);
-                        console.log('👌👌👌 LAST LANDING');
-                        
-                    }                    
-                    this.ticker.remove(fall);
-                }
-            }            
-            
-            setTimeout((): void => {
-                this.ticker.add(fall);
-            },this.calcDelay());            
-        });
-    };
-
-    public removeSymbol(): Promise<void> {                    
-        return new Promise((landing): void =>{
-            let velocity = GameConstant.fallingSpeed;            
-
-            const fall = (delta: number): void =>{
-                this.container.y += velocity * delta;                
-                
-                if (this.container.y >= GameConstant.dropReelPos) {                                        
-                    landing();
-                    console.log("💥 REMOVED");
-                    if (this.colIndex == GameConstant.reels.cols &&
-                        this.rowIndex == GameConstant.reels.rows) {
-                        this.emitter.emit(GameConstant.reelsEvent.clean);
-                        console.log('💥💥💥 LAST REMOVED');
-                    }
-                    // this.container.visible = false;
-                    this.ticker.remove(fall);                    
-                }
-            }            
-            
-            setTimeout((): void => {
-                this.ticker.add(fall);
-            },this.calcDelay());                     
-        });
-    };
 
 }

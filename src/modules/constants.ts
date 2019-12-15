@@ -18,7 +18,7 @@ export const GameConstant = {
     },
 
     fallingSpeed: 50,
-    fallingDelay: 70,
+    fallingDelay: 90,
     dropReelDelay: 200,
     dropReelPos: 1000,
     spinBtnPressedDelay: 200,
