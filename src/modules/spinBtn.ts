@@ -43,9 +43,8 @@ export default class SpinBtn {
 
     init() {        
         this.container.addChild(this.button);
-        this.container.y = 10;
-        this.container.x = 10;   
-        this.container.scale.set(0.5, 0.5);
+        this.container.x = 1200;
+        this.container.y = 800
         this.button.buttonMode = true;
         this.button.interactive = true;
         

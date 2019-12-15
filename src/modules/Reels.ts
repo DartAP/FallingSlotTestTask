@@ -22,8 +22,8 @@ export default class Reels {
         this.container = new PIXI.Container;
         this.ticker = ticker;              
         this.emiter = emitter;  
-        this.container.y = 100;
-        this.container.scale.set(0.5, 0.5);        
+        this.container.x = GameConstant.game.posx;
+        this.container.y = GameConstant.game.posy;        
 
         this.addListeners();
         this.initSpin();
@@ -31,7 +31,7 @@ export default class Reels {
     }
 
     private addListeners() {
-        this.emiter.on(GameConstant.spinBtnEvent.spin, () => {this.removeReels()});//{this.initSpin()});        
+        this.emiter.on(GameConstant.spinBtnEvent.spin, () => {this.removeReels()});     
         this.emiter.on(GameConstant.reelsEvent.ready, () => {this.reelState = SymbolState.READY});
         this.emiter.on(GameConstant.reelsEvent.clean, () => {this.dropReels()});
         
@@ -55,15 +55,12 @@ export default class Reels {
     }
 
     public removeReels() {
-        console.log('💩 DAMN: ' + this.reels.length);
-        
         this.reels.forEach(item => {
             item.removeSymbol(GameConstant.dropReelPos);
         });
     }
 
     public dropReels() {
-        // this.reelState = SymbolState.FALLING
         this.container.y = 100;
         this.reels.forEach(item => {
             item.dropSymbol();

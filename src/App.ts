@@ -13,8 +13,8 @@ export default class App{
     static start(){        
         
         const app = new PIXI.Application({
-            width: 800,
-            height: 600,
+            width: GameConstant.game.width,
+            height: GameConstant.game.height,
             antialias: true,
             transparent: false,
             resolution: 1

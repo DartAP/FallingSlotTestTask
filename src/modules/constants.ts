@@ -1,5 +1,11 @@
 export const GameConstant = {
     //=== VALUES ===//
+    game: {
+        height: 1000,
+        width: 1400,
+        posx: -200,
+        posy: 20
+    },
 
     symbol: {
         height: 226,
@@ -11,8 +17,8 @@ export const GameConstant = {
         cols: 3
     },
 
-    fallingSpeed: 25,
-    fallingDelay: 200,
+    fallingSpeed: 50,
+    fallingDelay: 70,
     dropReelDelay: 200,
     dropReelPos: 1000,
     spinBtnPressedDelay: 200,

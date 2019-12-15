@@ -38,7 +38,7 @@ export default class ReelSymbol extends PIXI.DisplayObject {
     }    
 
     private calcGround(): number {
-        return Math.trunc((GameConstant.reels.cols - this.colIndex) * this.size.height);
+        return (GameConstant.reels.cols - this.colIndex) * this.size.height;
     }
 
     private calcDelay(): number {
@@ -61,10 +61,10 @@ export default class ReelSymbol extends PIXI.DisplayObject {
 
     public dropSymbol(groundY?: number): Promise<void> {                        
         return new Promise((landing): void =>{
-            this.container.y = Math.floor((this.colIndex * -3) * this.size.height);
+            this.container.y = (this.colIndex * -3) * this.size.height;
             groundY = this.calcGround(); //groundY ? groundY : 
             this.container.visible = true;
-            console.log('⬇ DROPPED');
+            // console.log('⬇ DROPPED');
             let velocity = GameConstant.fallingSpeed;
 
             const fall = (delta: number): void =>{
@@ -72,8 +72,10 @@ export default class ReelSymbol extends PIXI.DisplayObject {
                 
                 if (this.container.y >= groundY) {                                        
                     landing();
+                    this.container.y = groundY;
                     console.log("👌 LANDED");
                     this.sound.play();
+
                     if (this.colIndex == GameConstant.reels.cols &&
                         this.rowIndex == GameConstant.reels.rows) {
                         this.emitter.emit(GameConstant.reelsEvent.ready);
