@@ -1,8 +1,6 @@
 import * as PIXI from 'pixi.js';
-import App from '../App';
 import { GameConstant } from './constants';
 import { EventEmitter } from 'events';
-import { emit } from 'cluster';
 
 enum btnState {
     normal = 'IDLE',
@@ -67,15 +65,9 @@ export default class SpinBtn {
             if (this.state == btnState.normal) {      
                 this.swapTexture(this.pressedTexture);          
                 this.sound.play();
-                
-                // this.emitter.emit(GameConstant.reelsEvent.remove);      
+                                
                 this.emitter.emit(GameConstant.spinBtnEvent.spin);                
-                this.emitter.emit(GameConstant.spinBtnEvent.disable)
-
-                setTimeout(() => {
-                    
-                }, GameConstant.spinBtnPressedDelay);
-                
+                this.emitter.emit(GameConstant.spinBtnEvent.disable)                
             }
         })        
 

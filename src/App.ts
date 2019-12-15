@@ -1,7 +1,6 @@
 import * as PIXI from 'pixi.js';
 import Reels from './modules/Reels';
 import { GameConstant } from './modules/constants';
-import ReelSymbol from './modules/ReelSymbol';
 import { EventEmitter } from 'events';
 import SpinBtn from './modules/spinBtn';
 
@@ -35,24 +34,7 @@ export default class App{
         mainScene.addChild(spinBtn.getContainer);
         
         app.stage.addChild(mainScene);
-        appEmitter.emit(GameConstant.spinBtnEvent.spin);
-
-        appEmitter.on(GameConstant.spinBtnEvent.spin, () => {
-            console.log('🤦‍♂️MAIN: 🔁 SPINNED');            
-        })
-
-        appEmitter.on(GameConstant.reelsEvent.drop, () => {
-            console.log('🤦‍♂️MAIN: ⬇⬇ DROPPED');            
-        })
-
-        appEmitter.on(GameConstant.reelsEvent.remove, () => {
-            console.log('🤦‍♂️MAIN: 💥 REMOVED');            
-        })
-
-        appEmitter.on(GameConstant.reelsEvent.ready, () => {
-            console.log('🤦‍♂️MAIN: 👌👌 READY');            
-        })
-        
+        appEmitter.emit(GameConstant.spinBtnEvent.spin);        
     };
 
     static initAssets() {

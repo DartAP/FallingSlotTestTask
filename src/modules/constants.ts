@@ -4,7 +4,7 @@ export const GameConstant = {
         height: 1000,
         width: 1400,
         posx: -200,
-        posy: 20
+        posy: 100
     },
 
     symbol: {
@@ -61,8 +61,6 @@ export const GameConstant = {
         disable: 'SPINBTN_DISABLE'
     },
     reelsEvent: {
-        drop: 'DROP_NEW_REELS',
-        remove: 'REMOVE_REELS',
         ready: 'REELS_IS_READY',
         clean: 'REELS_IS_CLEAN'
     }

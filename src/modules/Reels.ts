@@ -2,20 +2,12 @@ import * as PIXI from 'pixi.js';
 import ReelSymbol from './ReelSymbol';
 import { GameConstant } from './constants';
 import { EventEmitter } from 'events';
-import App from '../App';
-
-enum SymbolState{
-    IDLE = 'IDLE',
-    FALLING = 'FALLING',
-    READY = 'READY'    
-}
 
 export default class Reels {
 
     private container: PIXI.Container = new PIXI.Container;
     private reels: ReelSymbol[] = new Array<ReelSymbol>();
     private ticker: PIXI.Ticker;
-    private reelState = 'IDLE';
     private emiter: EventEmitter;
 
     constructor(ticker: PIXI.Ticker, emitter: EventEmitter) {        
@@ -26,13 +18,11 @@ export default class Reels {
         this.container.y = GameConstant.game.posy;        
 
         this.addListeners();
-        this.initSpin();
-        console.log('init reels');
+        this.initSpin();        
     }
 
     private addListeners() {
-        this.emiter.on(GameConstant.spinBtnEvent.spin, () => {this.removeReels()});     
-        this.emiter.on(GameConstant.reelsEvent.ready, () => {this.reelState = SymbolState.READY});
+        this.emiter.on(GameConstant.spinBtnEvent.spin, () => {this.removeReels()});
         this.emiter.on(GameConstant.reelsEvent.clean, () => {this.dropReels()});
         
     }
@@ -46,22 +36,17 @@ export default class Reels {
                     this.container.addChild(symbol.symbolContainer);
                     this.reels.push(symbol);
                 }
-            },200);            
-        }        
-        console.log('INIT SPIN'); 
-        console.log('Reels[].length: ' + this.reels.length);
-        console.log('Reels container childs: ' + this.container.children.length);
-        
+            },GameConstant.dropReelDelay);            
+        }                
     }
 
     public removeReels() {
         this.reels.forEach(item => {
-            item.removeSymbol(GameConstant.dropReelPos);
+            item.removeSymbol();
         });
     }
 
-    public dropReels() {
-        this.container.y = 100;
+    public dropReels() {        
         this.reels.forEach(item => {
             item.dropSymbol();
         });

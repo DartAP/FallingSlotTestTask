@@ -10,11 +10,11 @@ export default class ReelSymbol extends PIXI.DisplayObject {
         width: number
     }
     private sound: Howl;    
-    private container: PIXI.Container;
-    private state: string = 'IDLE';
+    private container: PIXI.Container;    
     private colIndex: number;
     private rowIndex: number;
     private ticker: PIXI.Ticker;
+    private symbol: PIXI.Sprite;
     private emitter: EventEmitter;
     
     public constructor(ticker: PIXI.Ticker, emitter: EventEmitter, colIndex: number, rowIndex: number) {
@@ -25,14 +25,13 @@ export default class ReelSymbol extends PIXI.DisplayObject {
         this.rowIndex = rowIndex;
         this.ticker = ticker;
         this.emitter = emitter;
-        this.init();        
-        console.log('init reel symbol');      
+        this.init();                    
     }    
 
     init() {
-        const symbol = new PIXI.Sprite(this.getRandomTexture())
+        this.symbol = new PIXI.Sprite(this.getRandomTexture())        
         this.sound = new Howl({src: this.getRandomSound()});
-        this.container.addChild(symbol);        
+        this.container.addChild(this.symbol);        
         this.container.x = this.rowIndex * this.size.height;
         this.dropSymbol();
     }    
@@ -59,12 +58,12 @@ export default class ReelSymbol extends PIXI.DisplayObject {
         return this.container;
     }
 
-    public dropSymbol(groundY?: number): Promise<void> {                        
+    public dropSymbol(): Promise<void> {                        
         return new Promise((landing): void =>{
             this.container.y = (this.colIndex * -3) * this.size.height;
-            groundY = this.calcGround(); //groundY ? groundY : 
-            this.container.visible = true;
-            // console.log('⬇ DROPPED');
+            let groundY = this.calcGround();
+            this.symbol.texture = this.getRandomTexture();
+            this.container.visible = true;            
             let velocity = GameConstant.fallingSpeed;
 
             const fall = (delta: number): void =>{
@@ -79,7 +78,7 @@ export default class ReelSymbol extends PIXI.DisplayObject {
                     if (this.colIndex == GameConstant.reels.cols &&
                         this.rowIndex == GameConstant.reels.rows) {
                         this.emitter.emit(GameConstant.reelsEvent.ready);
-                        console.log('LAST LANDING==========================================================================');
+                        console.log('👌👌👌 LAST LANDING');
                         
                     }                    
                     this.ticker.remove(fall);
@@ -92,14 +91,14 @@ export default class ReelSymbol extends PIXI.DisplayObject {
         });
     };
 
-    public removeSymbol(groundY?: number): Promise<void> {                    
+    public removeSymbol(): Promise<void> {                    
         return new Promise((landing): void =>{
             let velocity = GameConstant.fallingSpeed;            
 
             const fall = (delta: number): void =>{
                 this.container.y += velocity * delta;                
                 
-                if (this.container.y >= groundY) {                                        
+                if (this.container.y >= GameConstant.dropReelPos) {                                        
                     landing();
                     console.log("💥 REMOVED");
                     if (this.colIndex == GameConstant.reels.cols &&
